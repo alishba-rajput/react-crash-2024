@@ -11,7 +11,12 @@ const JobListings = ({ isHome = false }) => {
       const apiUrl = isHome ? '/api/jobs?_limit=3' : '/api/jobs';
       try {
         const res = await fetch(apiUrl);
-        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const text = await res.text();
+        console.log('Response text:', text); // Debugging line
+        const data = text ? JSON.parse(text) : [];
         setJobs(data);
       } catch (error) {
         console.log('Error fetching data', error);
@@ -19,9 +24,10 @@ const JobListings = ({ isHome = false }) => {
         setLoading(false);
       }
     };
+    
 
     fetchJobs();
-  }, []);
+  }, [isHome]); // Added isHome to the dependency array
 
   return (
     <section className='bg-blue-50 px-4 py-10'>
